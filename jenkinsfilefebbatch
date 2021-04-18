@@ -10,6 +10,8 @@ echo "Jenkins Home is: --> ${env.JENKINS_HOME}"
 echo "Jenkins URL is: -->  ${env.JENKINS_URL}"
 echo "JOB Name is: -->  ${env.JOB_NAME}"
 
+properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')), [$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([pollSCM('* * * * *')])])
+
 stage('GetCodeFromGithub')
 {
 git branch: 'development', credentialsId: '298b77f3-919b-4179-a2d5-9db673ad365b', url: 'https://github.com/devops-training-jan/maven-web-application.git'
