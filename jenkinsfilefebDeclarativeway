@@ -1,0 +1,82 @@
+pipeline{
+
+agent any
+
+tools
+{
+maven 'maven3.6.3'
+}
+
+triggers{
+pollSCM('* * * * *')
+}
+
+options{
+
+timestamps()
+buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')), [$class: 'JobLocalConfiguration', changeReasonComment: '']
+}
+
+stages{
+
+	stage('GetCodeFromGithub'){
+		steps
+		{
+		git branch: 'development', credentialsId: '298b77f3-919b-4179-a2d5-9db673ad365b', url: 'https://github.com/devops-training-jan/maven-web-application.git'
+		}
+	}
+	
+	stage('Build'){
+		steps
+		{
+		sh "mvn clean package"
+		}
+	}
+	
+	stage('ExecuteSonarQubeReport'){
+		steps
+		{
+		sh "mvn sonar:sonar"
+		}
+	}
+	
+	stage('UploadArtifactsToNexus'){
+		steps
+		{
+		sh "mvn deploy"
+		}
+	}
+	
+	stage('DeployAppToTomcatServer'){
+		steps
+		{
+		/*
+		sshagent(['fb63a3cb-399b-4407-a11d-7687be1eec68']) 
+		{
+		sh "rm -rf /opt/apache-tomcat-9.0.44/webapps/maven-web-application.war"
+		sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.127.220.134:/opt/apache-tomcat-9.0.44/webapps/"}
+		*/
+		deploy adapters: [tomcat9(credentialsId: '8c94832f-7147-4a23-b8d8-ba71386cf348', path: '', url: 'http://13.127.220.134:2040/')], contextPath: null, war: '**/maven-web-application.war'
+		}
+	}
+	
+}
+	post{
+
+		success{
+		emailext body: '''Build Completed-Success - Declarative way
+
+		Thanks & Regards,
+		Thasleem Patan''', subject: 'Build Completed-Success - Declarative way', to: 'thasleempatan514@gmail.com,khadar.ahs@gmail.com'
+		}
+
+		failure{
+		emailext body: '''Build Completed-Failure - Declarative way
+
+		Thanks & Regards,
+		Thasleem Patan''', subject: 'Build Completed-Failure - Declarative way', to: 'thasleempatan514@gmail.com,khadar.ahs@gmail.com'
+		}
+	
+	}	
+}
+
