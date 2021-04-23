@@ -15,11 +15,11 @@ stage('GetCodeFromGithub')
 {
 git branch: 'development', credentialsId: '298b77f3-919b-4179-a2d5-9db673ad365b', url: 'https://github.com/devops-training-jan/maven-web-application.git'
 }
-/*
 stage('Build')
 {
 sh "${mavenHome}/bin/mvn clean package"
 }
+/*
 stage('ExecuteSonarQubeReport')
 {
 sh "${mavenHome}/bin/mvn sonar:sonar"
