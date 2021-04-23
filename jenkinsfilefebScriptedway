@@ -36,6 +36,7 @@ stage('DeployAppToTomcatServer')
 		sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.127.220.134:/opt/apache-tomcat-9.0.44/webapps/"}*/
 deploy adapters: [tomcat9(credentialsId: '8c94832f-7147-4a23-b8d8-ba71386cf348', path: '', url: 'http://13.127.220.134:2040/')], contextPath: null, war: '**/maven-web-application.war'
 }
+*/
 stage('SendEmailNotification')
 {
 emailext body: '''Build Completed - Scriptedway
@@ -43,6 +44,4 @@ emailext body: '''Build Completed - Scriptedway
 Thanks & Regards,
 Thasleem Patan''', subject: 'Build Completed - Scriptedway', to: 'thasleempatan514@gmail.com'
 }
-*/
-
 }
